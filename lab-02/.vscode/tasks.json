@@ -6,7 +6,37 @@
     {
       "label": "build",
       "type": "shell",
-      "command": "g++ parser.cpp postfix.cpp -g -std=c++17 -o postfix"
+      // Comando que será executado
+      "command": "make",
+      "problemMatcher": "$gcc",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "options": {
+        "cwd": "${workspaceFolder}/Debug"
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": true
+      }
+    },
+    {
+      "label": "cmake",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "../"
+      ],
+      "group": "build",
+      "options": {
+        "cwd": "${workspaceFolder}/Debug"
+      },
+      "problemMatcher": [],
     }
   ]
 }
