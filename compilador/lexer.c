@@ -62,7 +62,7 @@ Token scanToken()
     return identificador();
   }
 
-  if (isalnum(c))
+  if (isdigit(c))
   {
     return numero();
   }

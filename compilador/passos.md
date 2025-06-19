@@ -11,7 +11,7 @@
 # Passos
 - [x] Definir os tokens
 - [x] Construir o lexer.h com a definição dos tokens e um struct para armazenar as informações de um token
-- [ ] Constuir o Lexer.c, para se como o nosso scanner, para ler o código e dividir ele em uma sequência de "partes"(tokens) que fazem sentido para a linguagem de programação.
+- [x] Constuir o Lexer.c, para se como o nosso scanner, para ler o código e dividir ele em uma sequência de "partes"(tokens) que fazem sentido para a linguagem de programação.
   - [x] Falta verificar os identifadores e descobrir se é uma palavra chave ou um identificador
-  - [ ] Verificar se é um digito
-  - [ ] Verificar se são os outros símbolos
+  - [x] Verificar se é um digito
+  - [x] Verificar se são os outros símbolos
