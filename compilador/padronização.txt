@@ -1,0 +1,5 @@
+constantes -> SNAKE_CASE_GRITANDO
+variáveis e parametros de funções -> snake_case
+funcoes -> snake_case
+tipos de dados -> PascalCase
+membros de enum -> SNAKE_CASE_GRITANDO

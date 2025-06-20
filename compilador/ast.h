@@ -3,7 +3,7 @@
 #define AST_H
 
 #include "lexer.h"
-struct Expr;
+typedef struct AstNode AstNode;
 
 // Etiquetas para os nós
 typedef enum
@@ -19,28 +19,28 @@ typedef struct AstNode
   NodeType type;
 } AstNode;
 
-// Nós especificos
+// -- Nós especificos --
 typedef struct
 {
   AstNode base;
   int valor;
 } LiteralNode;
 
-// Expressão binária
 typedef struct
 {
   AstNode base;
-  struct Expr *esquerda;
-  struct Expr *direita;
+  AstNode *esquerda;
+  AstNode *direita;
   Token operador;
 } ExpressaoBinariaNode;
 
-// Declaração de variável
 typedef struct
 {
   AstNode base;
   Token nome;
-  struct Expr* inicializador;
-}DeclaracaoVariavelNode;
+  AstNode *inicializador;
+} DeclaracaoVariavelNode;
 
+AstNode *criar_no_declaracao_variavel(Token nome, AstNode *inicializador);
+AstNode *criar_no_literal(Token numero);
 #endif
