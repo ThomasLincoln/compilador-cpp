@@ -37,14 +37,15 @@ typedef struct
 } Parser;
 Parser parser;
 
-void parse(const char *source)
+AstNode* parse(const char *source)
 {
   initLexer(source);
   advance();
-  while (!check(TOKEN_EOF))
+  if (!check(TOKEN_EOF))
   {
-    parse_declaracao();
+    return parse_declaracao();
   }
+  return NULL;
 }
 
 // Função para avançar para o próximo Token
@@ -103,7 +104,7 @@ void consume(TokenType type, const char *mensagem)
 
 static AstNode *parse_declaracao()
 {
-  parse_declaracao_variavel();
+  return parse_declaracao_variavel();
 }
 
 static AstNode *parse_declaracao_variavel()

@@ -1,14 +1,4 @@
-// teste.txt
-
-// Calcula o fatorial de um numero
-int fatorial = 1;
-int numero = 5;
-
-while (numero > 1) {
-    fatorial = fatorial * numero;
-    numero = numero - 1;
-}
-
-if (fatorial == 120) {
-    return fatorial;
-}
+// teste.txt (versão simplificada)
+int a = 10;
+int b;
+int c = 25;

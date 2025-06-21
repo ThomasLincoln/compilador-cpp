@@ -2,19 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include "lexer.h"
-
-// --- CONTROLE DE DEBUG ---
-// Mude para 0 para desativar todas as mensagens de debug
-#define DEBUG_MODE 0
-
-// --- MACRO DE DEBUG ---
-// Se DEBUG_MODE for 1, LOG_DEBUG vira um printf.
-// Se for 0, LOG_DEBUG vira "nada" e é ignorado pelo compilador.
-#if DEBUG_MODE == 1
-#define LOG_DEBUG(...) printf(__VA_ARGS__)
-#else
-#define LOG_DEBUG(...)
-#endif
+#include "parser.h"
+#include "ast_printer.h"
 
 // Esta função converte um TokenType (int) para uma string legível.
 const char* tokenTypeToString(TokenType type) {
@@ -82,7 +71,6 @@ void runTest(const char *testName, const char *source)
 
 static char *readFile(const char *path)
 {
-  LOG_DEBUG("[DEBUG] Tentando abrir o arquivo: %s\n", path);
   FILE *file = fopen(path, "rb");
   if (file == NULL)
   {
@@ -94,8 +82,6 @@ static char *readFile(const char *path)
   size_t fileSize = ftell(file);
   rewind(file);
 
-  LOG_DEBUG("[DEBUG] Tamanho do arquivo detectado: %zu bytes\n", fileSize);
-
   char *buffer = (char *)malloc(fileSize + 1);
   if (buffer == NULL)
   {
@@ -104,7 +90,6 @@ static char *readFile(const char *path)
   }
 
   size_t bytesRead = fread(buffer, sizeof(char), fileSize, file);
-  LOG_DEBUG("[DEBUG] Bytes lidos do arquivo: %zu\n", bytesRead);
 
   if (bytesRead < fileSize)
   {
@@ -114,25 +99,11 @@ static char *readFile(const char *path)
 
   buffer[bytesRead] = '\0';
   fclose(file);
-
-  LOG_DEBUG("[DEBUG] Arquivo lido com sucesso e fechado.\n");
   return buffer;
 }
 
 int main(int argc, const char *argv[])
 {
-  // printf("--- Iniciando Testes Unitarios Internos ---\n\n");
-  // runTest("Palavra-chave 'if'", "if");
-  // runTest("Identificador 'soma'", "soma");
-  // runTest("Espacos em branco", "   while   return   ");
-  // runTest("Sequencia mista", "if variavel_x else");
-  // runTest("Sequencia mista com variavel comecando com numero", "if 2variavel2_x else");
-  // runTest("Sequencia mista com numero no meio da variavel", "if variavel2_x else");
-  // runTest("Sequencia mista com numero no fim da variavel", "if variavel_2 else");
-  // runTest("apenas numeros", "123 2382");
-  // runTest("numeros e identificadores", "variavel1 = 99");
-  // printf("--- Fim dos Testes Unitarios ---\n\n");
-
   if (argc < 2)
   {
     printf("INFO: Nenhum arquivo fornecido para analise. Encerrando.\n");
@@ -145,36 +116,10 @@ int main(int argc, const char *argv[])
   printf("--- Iniciando analise do arquivo: %s ---\n", nomeDoArquivo);
 
   char *codigoDoArquivo = readFile(nomeDoArquivo);
-  LOG_DEBUG("[DEBUG] Conteudo do arquivo carregado na memoria. Inicio: \"%.20s...\"\n", codigoDoArquivo);
-
-  initLexer(codigoDoArquivo);
-
-  printf("--- Tokens Encontrados no Arquivo ---\n");
-  int line = 1;
-  for (;;)
-  {
-    Token token = scanToken();
-    if (token.line != line)
-    {
-      printf("%4d ", token.line);
-      line = token.line;
-    }
-    else
-    {
-      printf("   | ");
-    }
-    printf("Tipo: %s | Lexema: '%.*s'", tokenTypeToString(token.type), token.length, token.start);
-    if (token.type == TOKEN_NUMBER)
-    {
-      printf(" | Valor: %d", token.value.integer);
-    }
-    printf("\n");
-
-    if (token.type == TOKEN_EOF)
-      break;
-  }
+  AstNode* arvore = parse(codigoDoArquivo);
+  imprimir_ast(arvore);
+  
 
   free(codigoDoArquivo);
-  LOG_DEBUG("[DEBUG] Memoria do arquivo liberada.\n");
   return 0;
 }
