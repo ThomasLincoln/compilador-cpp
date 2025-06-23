@@ -116,9 +116,7 @@ int main(int argc, const char *argv[])
   printf("--- Iniciando analise do arquivo: %s ---\n", nomeDoArquivo);
 
   char *codigoDoArquivo = readFile(nomeDoArquivo);
-  AstNode* arvore = parse(codigoDoArquivo);
-  imprimir_ast(arvore);
-  
+  parse(codigoDoArquivo);  
 
   free(codigoDoArquivo);
   return 0;

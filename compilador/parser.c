@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include "lexer.h"
 #include "parser.h"
 #include "ast.h"
+#include "ast_printer.h"
 
 // ===================================================================
 // 1. DECLARAÇÕES ANTECIPADAS (FORWARD DECLARATIONS)
@@ -37,15 +39,19 @@ typedef struct
 } Parser;
 Parser parser;
 
-AstNode* parse(const char *source)
+void parse(const char *source)
 {
   initLexer(source);
   advance();
-  if (!check(TOKEN_EOF))
+  while (!check(TOKEN_EOF))
   {
-    return parse_declaracao();
+    AstNode *declaracao_atual = parse_declaracao();
+    printf("\n--- Arvore Sintatica para a Declaracao ---\n");
+    imprimir_ast(declaracao_atual);
+
+    if (parser.hadError)
+      break;
   }
-  return NULL;
 }
 
 // Função para avançar para o próximo Token
@@ -57,7 +63,7 @@ void advance()
     parser.current = scanToken();
     if (parser.current.type != TOKEN_ERROR)
       break;
-      // * no futuro teremos um tratamento de erro mais robusto
+    // * no futuro teremos um tratamento de erro mais robusto
   }
 }
 
@@ -80,8 +86,6 @@ Token previous()
 
 bool check(TokenType type)
 {
-  if (peek().type == TOKEN_EOF)
-    return false;
   return peek().type == type;
 }
 
@@ -92,6 +96,28 @@ bool match(TokenType type)
   advance();
   return true;
 }
+static void error(Token *token, const char *mensagem)
+{
+  if (parser.panicMode)
+    return;
+  parser.panicMode = true;
+  fprintf(stderr, "[linha %d] Erro", token->line);
+
+  if (token->type == TOKEN_EOF)
+  {
+    fprintf(stderr, " no final do arquivo");
+  }
+  else if (token->type == TOKEN_ERROR)
+  {
+  }
+  else
+  {
+    fprintf(stderr, ": %.*s", token->length, token->start);
+  }
+  fprintf(stderr, ": %s\n", mensagem);
+  parser.hadError = true;
+  exit(EXIT_FAILURE);
+}
 
 void consume(TokenType type, const char *mensagem)
 {
@@ -100,6 +126,8 @@ void consume(TokenType type, const char *mensagem)
     advance();
     return;
   }
+
+  error(&parser.current, mensagem);
 }
 
 static AstNode *parse_declaracao()

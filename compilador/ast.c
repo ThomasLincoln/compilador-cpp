@@ -21,4 +21,3 @@ AstNode *criar_no_literal(Token numero)
   node->valor = numero.value.integer;
   return (AstNode *)node;
 }
-

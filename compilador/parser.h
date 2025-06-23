@@ -8,5 +8,5 @@
 // O main.c vai chamá-la para iniciar a análise sintática.
 // Ela recebe o código-fonte como entrada.
 // No futuro, ela retornará a raiz da sua AST (ex: AstNode* parse(...))
-AstNode* parse(const char* source);
+void parse(const char* source);
 #endif
