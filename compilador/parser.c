@@ -43,15 +43,25 @@ void parse(const char *source)
 {
   initLexer(source);
   advance();
+  AstNode *programa_generico = criar_no_programa();
+  ProgramaNode *programa = (ProgramaNode *)programa_generico;
+  AstNode *cabeca = NULL;
+  AstNode *cauda = NULL;
   while (!check(TOKEN_EOF))
   {
     AstNode *declaracao_atual = parse_declaracao();
-    printf("\n--- Arvore Sintatica para a Declaracao ---\n");
-    imprimir_ast(declaracao_atual);
 
+    if(cabeca == NULL && cauda == NULL){
+      cabeca = cauda = declaracao_atual;
+    } else {
+      cauda->irmao = declaracao_atual;
+      cauda = declaracao_atual;
+    }
     if (parser.hadError)
       break;
   }
+  programa->filho = cabeca;
+  imprimir_ast(programa_generico);
 }
 
 // Função para avançar para o próximo Token

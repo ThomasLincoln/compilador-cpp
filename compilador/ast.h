@@ -10,13 +10,15 @@ typedef enum
 {
   NODE_LITERAL,
   NODE_EXPR_BINARIA,
-  NODE_DECL_VARIAVEL
+  NODE_DECL_VARIAVEL,
+  NODE_PROG,
 } NodeType;
 
 // Base para os nós
 typedef struct AstNode
 {
   NodeType type;
+  AstNode* irmao;
 } AstNode;
 
 // -- Nós especificos --
@@ -41,6 +43,13 @@ typedef struct
   AstNode *inicializador;
 } DeclaracaoVariavelNode;
 
+typedef struct
+{
+  AstNode base;
+  AstNode *filho;
+}ProgramaNode;
+
 AstNode *criar_no_declaracao_variavel(Token nome, AstNode *inicializador);
 AstNode *criar_no_literal(Token numero);
+AstNode *criar_no_programa();
 #endif
