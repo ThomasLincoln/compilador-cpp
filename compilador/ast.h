@@ -12,6 +12,8 @@ typedef enum
   NODE_EXPR_BINARIA,
   NODE_DECL_VARIAVEL,
   NODE_PROG,
+  NODE_EXPR_UNARIA,
+  NODE_EXPR_VARIAVEL,
 } NodeType;
 
 // Base para os nós
@@ -49,8 +51,22 @@ typedef struct
   AstNode *filho;
 } ProgramaNode;
 
+typedef struct
+{
+  AstNode base;
+  Token operador;
+  AstNode* direita;
+} UnaryExprNode;
+
+typedef struct {
+    AstNode base;
+    Token nome;
+} VariavelExprNode;
+
 AstNode *criar_no_declaracao_variavel(Token nome, AstNode *inicializador);
 AstNode *criar_no_literal(Token numero);
 AstNode *criar_no_programa();
 AstNode *criar_no_expressao_binaria(Token operador, AstNode *esquerda, AstNode *direita);
+AstNode *criar_no_expressao_unaria(Token operador, AstNode *direita);
+AstNode* criar_no_expressao_variavel(Token nome);
 #endif

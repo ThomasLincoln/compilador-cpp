@@ -23,8 +23,14 @@ static void imprimir_no_com_indentacao(AstNode *no, int indentacao)
 
     switch (no->type)
     {
+    case NODE_EXPR_VARIAVEL:
+    {
+        VariavelExprNode *expr = (VariavelExprNode *)no;
+        printf("└── Variavel (nome: %.*s)\n", expr->nome.length, expr->nome.start);
+        break;
+    }
     case NODE_EXPR_BINARIA:
-        ExpressaoBinariaNode* expr = (ExpressaoBinariaNode*)no;
+        ExpressaoBinariaNode *expr = (ExpressaoBinariaNode *)no;
         // Imprime o nó pai (o operador) com seu "galho"
         printf("└── Expr.Binaria (op: %.*s)\n", expr->operador.length, expr->operador.start);
 
@@ -32,6 +38,14 @@ static void imprimir_no_com_indentacao(AstNode *no, int indentacao)
         imprimir_no_com_indentacao(expr->esquerda, indentacao + 1);
         imprimir_no_com_indentacao(expr->direita, indentacao + 1);
         break;
+    case NODE_EXPR_UNARIA: // Supondo que você crie esta etiqueta em ast.h
+    {
+        UnaryExprNode *expr = (UnaryExprNode *)no;
+        printf("└── Expr.Unaria (op: %.*s)\n", expr->operador.length, expr->operador.start);
+
+        imprimir_no_com_indentacao(expr->direita, indentacao + 1);
+        break;
+    }
     case NODE_PROG:
     {
         ProgramaNode *prog = (ProgramaNode *)no;

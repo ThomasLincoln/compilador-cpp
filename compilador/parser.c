@@ -193,12 +193,20 @@ static AstNode *parse_fator(){
 }
 
 static AstNode *parse_unario(){
+  if(match(TOKEN_MINUS)){
+    Token operador = previous();
+    AstNode *direita = parse_unario();
+    return criar_no_expressao_unaria(operador, direita);
+  }
   return parse_primario();
 }
 
 static AstNode *parse_primario(){
   if(match(TOKEN_NUMBER)){
     return criar_no_literal(previous());
+  }
+  if(match(TOKEN_IDENTIFIER)){
+    return criar_no_expressao_variavel(previous());
   }
 
   return NULL;

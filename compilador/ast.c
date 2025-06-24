@@ -33,13 +33,32 @@ AstNode *criar_no_programa()
   return (AstNode *)node;
 }
 
-AstNode *criar_no_expressao_binaria(Token operador, AstNode *esquerda, AstNode *direita){
+AstNode *criar_no_expressao_binaria(Token operador, AstNode *esquerda, AstNode *direita)
+{
   ExpressaoBinariaNode *node = (ExpressaoBinariaNode *)
-    malloc(sizeof(ExpressaoBinariaNode));
+      malloc(sizeof(ExpressaoBinariaNode));
   node->base.type = NODE_EXPR_BINARIA;
   node->base.irmao = NULL;
   node->esquerda = esquerda;
   node->direita = direita;
   node->operador = operador;
   return (AstNode *)node;
+}
+
+AstNode *criar_no_expressao_unaria(Token operador, AstNode *direita)
+{
+  UnaryExprNode *node = (UnaryExprNode *)malloc(sizeof(UnaryExprNode));
+  node->base.type = NODE_EXPR_UNARIA;
+  node->base.irmao = NULL;
+  node->operador = operador;
+  node->direita = direita;
+  return (AstNode *)node;
+}
+
+AstNode* criar_no_expressao_variavel(Token nome) {
+    VariavelExprNode* node = (VariavelExprNode*)malloc(sizeof(VariavelExprNode));
+    node->base.type = NODE_EXPR_VARIAVEL;
+    node->base.irmao = NULL;
+    node->nome = nome;
+    return (AstNode*)node;
 }
