@@ -208,6 +208,11 @@ static AstNode *parse_primario(){
   if(match(TOKEN_IDENTIFIER)){
     return criar_no_expressao_variavel(previous());
   }
+  if(match(TOKEN_LPAREN)){
+    AstNode *expr = parse_expressao();
+    consume(TOKEN_RPAREN, "Tentando consumir o segundo parenteses");
+    return expr;
+  }
 
   return NULL;
 }
