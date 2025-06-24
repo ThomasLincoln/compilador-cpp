@@ -32,3 +32,14 @@ AstNode *criar_no_programa()
   node->filho = NULL;
   return (AstNode *)node;
 }
+
+AstNode *criar_no_expressao_binaria(Token operador, AstNode *esquerda, AstNode *direita){
+  ExpressaoBinariaNode *node = (ExpressaoBinariaNode *)
+    malloc(sizeof(ExpressaoBinariaNode));
+  node->base.type = NODE_EXPR_BINARIA;
+  node->base.irmao = NULL;
+  node->esquerda = esquerda;
+  node->direita = direita;
+  node->operador = operador;
+  return (AstNode *)node;
+}

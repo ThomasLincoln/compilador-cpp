@@ -23,6 +23,15 @@ static void imprimir_no_com_indentacao(AstNode *no, int indentacao)
 
     switch (no->type)
     {
+    case NODE_EXPR_BINARIA:
+        ExpressaoBinariaNode* expr = (ExpressaoBinariaNode*)no;
+        // Imprime o nó pai (o operador) com seu "galho"
+        printf("└── Expr.Binaria (op: %.*s)\n", expr->operador.length, expr->operador.start);
+
+        // Chama a si mesma recursivamente para imprimir os filhos com mais indentação
+        imprimir_no_com_indentacao(expr->esquerda, indentacao + 1);
+        imprimir_no_com_indentacao(expr->direita, indentacao + 1);
+        break;
     case NODE_PROG:
     {
         ProgramaNode *prog = (ProgramaNode *)no;

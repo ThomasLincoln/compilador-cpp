@@ -24,7 +24,11 @@ static Token previous();
 // Funções de parsing (uma para cada regra da gramática)
 static AstNode *parse_declaracao();
 static AstNode *parse_declaracao_variavel();
-static AstNode *parse_expressao(); // Corrigido de "parse_expressaO"
+static AstNode *parse_expressao();
+static AstNode *parse_primario();
+static AstNode *parse_fator();
+static AstNode *parse_unario();
+static AstNode *parse_termo();
 
 // ===================================================================
 // 2. ESTRUTURA E ESTADO DO PARSER
@@ -155,7 +159,6 @@ static AstNode *parse_declaracao_variavel()
   Token nome_da_variavel = previous();
   AstNode *inicializador = NULL;
 
-  // Verificar a parte opcional
   if (match(TOKEN_EQUAL))
   {
     inicializador = parse_expressao();
@@ -166,6 +169,37 @@ static AstNode *parse_declaracao_variavel()
 
 static AstNode *parse_expressao()
 {
-  consume(TOKEN_NUMBER, "Esperava um numero como expressao");
-  return criar_no_literal(previous());
+  return parse_termo();
+}
+
+static AstNode *parse_termo(){
+  AstNode *expr = parse_fator();
+  while(match(TOKEN_PLUS) || match(TOKEN_MINUS)){
+    Token operador = previous();
+    AstNode *direita = parse_fator();
+    expr = criar_no_expressao_binaria(operador, expr, direita);
+  }
+  return expr;
+}
+
+static AstNode *parse_fator(){
+  AstNode *expr = parse_unario();
+  while(match(TOKEN_SLASH) || match(TOKEN_MULT)){
+    Token operador = previous();
+    AstNode *direita = parse_unario();
+    expr = criar_no_expressao_binaria(operador, expr, direita);
+  }
+  return expr;
+}
+
+static AstNode *parse_unario(){
+  return parse_primario();
+}
+
+static AstNode *parse_primario(){
+  if(match(TOKEN_NUMBER)){
+    return criar_no_literal(previous());
+  }
+
+  return NULL;
 }

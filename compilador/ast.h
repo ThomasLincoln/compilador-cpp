@@ -18,7 +18,7 @@ typedef enum
 typedef struct AstNode
 {
   NodeType type;
-  AstNode* irmao;
+  AstNode *irmao;
 } AstNode;
 
 // -- Nós especificos --
@@ -47,9 +47,10 @@ typedef struct
 {
   AstNode base;
   AstNode *filho;
-}ProgramaNode;
+} ProgramaNode;
 
 AstNode *criar_no_declaracao_variavel(Token nome, AstNode *inicializador);
 AstNode *criar_no_literal(Token numero);
 AstNode *criar_no_programa();
+AstNode *criar_no_expressao_binaria(Token operador, AstNode *esquerda, AstNode *direita);
 #endif

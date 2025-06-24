@@ -1,4 +1,2 @@
-// teste.txt (versão simplificada)
-int a = 10;
-int b;
-int c = 25;
+// teste.txt com expressão binária
+int resultado = 10 + 2 * 5;
