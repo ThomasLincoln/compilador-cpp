@@ -29,6 +29,10 @@ static AstNode *parse_primario();
 static AstNode *parse_fator();
 static AstNode *parse_unario();
 static AstNode *parse_termo();
+static AstNode *parse_if();
+static AstNode *parse_statement();
+static AstNode *parse_expression_statement();
+static AstNode *parse_atribuicao();
 
 // ===================================================================
 // 2. ESTRUTURA E ESTADO DO PARSER
@@ -43,6 +47,8 @@ typedef struct
 } Parser;
 Parser parser;
 
+// Em parser.c
+
 void parse(const char *source)
 {
   initLexer(source);
@@ -51,15 +57,19 @@ void parse(const char *source)
   ProgramaNode *programa = (ProgramaNode *)programa_generico;
   AstNode *cabeca = NULL;
   AstNode *cauda = NULL;
+
   while (!check(TOKEN_EOF))
   {
-    AstNode *declaracao_atual = parse_declaracao();
+    AstNode *statement_atual = parse_statement();
 
-    if(cabeca == NULL && cauda == NULL){
-      cabeca = cauda = declaracao_atual;
-    } else {
-      cauda->irmao = declaracao_atual;
-      cauda = declaracao_atual;
+    if (cabeca == NULL)
+    {
+      cabeca = cauda = statement_atual;
+    }
+    else
+    {
+      cauda->irmao = statement_atual;
+      cauda = statement_atual;
     }
     if (parser.hadError)
       break;
@@ -77,7 +87,6 @@ void advance()
     parser.current = scanToken();
     if (parser.current.type != TOKEN_ERROR)
       break;
-    // * no futuro teremos um tratamento de erro mais robusto
   }
 }
 
@@ -144,11 +153,6 @@ void consume(TokenType type, const char *mensagem)
   error(&parser.current, mensagem);
 }
 
-static AstNode *parse_declaracao()
-{
-  return parse_declaracao_variavel();
-}
-
 static AstNode *parse_declaracao_variavel()
 {
   // precisamos do int
@@ -169,12 +173,34 @@ static AstNode *parse_declaracao_variavel()
 
 static AstNode *parse_expressao()
 {
-  return parse_termo();
+  return parse_atribuicao();
+}
+static AstNode *parse_atribuicao()
+{
+  AstNode *expr = parse_termo();
+
+  if (match(TOKEN_EQUAL))
+  {
+    Token igual = previous();
+    AstNode *valor = parse_atribuicao();
+
+    if (expr->type == NODE_EXPR_VARIAVEL)
+    {
+      Token nome = ((VariavelExprNode *)expr)->nome;
+      return criar_no_atribuicao(nome, valor);
+    }
+
+    error(&igual, "Alvo da atribuicao invalido.");
+  }
+
+  return expr;
 }
 
-static AstNode *parse_termo(){
+static AstNode *parse_termo()
+{
   AstNode *expr = parse_fator();
-  while(match(TOKEN_PLUS) || match(TOKEN_MINUS)){
+  while (match(TOKEN_PLUS) || match(TOKEN_MINUS))
+  {
     Token operador = previous();
     AstNode *direita = parse_fator();
     expr = criar_no_expressao_binaria(operador, expr, direita);
@@ -182,9 +208,11 @@ static AstNode *parse_termo(){
   return expr;
 }
 
-static AstNode *parse_fator(){
+static AstNode *parse_fator()
+{
   AstNode *expr = parse_unario();
-  while(match(TOKEN_SLASH) || match(TOKEN_MULT)){
+  while (match(TOKEN_SLASH) || match(TOKEN_MULT))
+  {
     Token operador = previous();
     AstNode *direita = parse_unario();
     expr = criar_no_expressao_binaria(operador, expr, direita);
@@ -192,8 +220,10 @@ static AstNode *parse_fator(){
   return expr;
 }
 
-static AstNode *parse_unario(){
-  if(match(TOKEN_MINUS)){
+static AstNode *parse_unario()
+{
+  if (match(TOKEN_MINUS))
+  {
     Token operador = previous();
     AstNode *direita = parse_unario();
     return criar_no_expressao_unaria(operador, direita);
@@ -201,18 +231,62 @@ static AstNode *parse_unario(){
   return parse_primario();
 }
 
-static AstNode *parse_primario(){
-  if(match(TOKEN_NUMBER)){
+static AstNode *parse_primario()
+{
+  if (match(TOKEN_NUMBER))
+  {
     return criar_no_literal(previous());
   }
-  if(match(TOKEN_IDENTIFIER)){
+  if (match(TOKEN_IDENTIFIER))
+  {
     return criar_no_expressao_variavel(previous());
   }
-  if(match(TOKEN_LPAREN)){
+  if (match(TOKEN_LPAREN))
+  {
     AstNode *expr = parse_expressao();
     consume(TOKEN_RPAREN, "Tentando consumir o segundo parenteses");
     return expr;
   }
 
   return NULL;
+}
+
+static AstNode *parse_if()
+{
+  consume(TOKEN_LPAREN, "Esperava '(' depois de 'if'.");
+  AstNode *condicao = parse_expressao();
+  consume(TOKEN_RPAREN, "Esperava ')' depois da condicao do if.");
+  consume(TOKEN_LBRACE, "Esperava '{' depois do ).");
+
+  AstNode *ramo_then = parse_statement();
+  consume(TOKEN_RBRACE, "Esperava '}' depois da declaracao.");
+
+  AstNode *ramo_else = NULL;
+  if (match(TOKEN_ELSE))
+  {
+    consume(TOKEN_LBRACE, "Esperava '{' depois do ).");
+    ramo_else = parse_statement();
+    consume(TOKEN_RBRACE, "Esperava '}' depois da declaracao.");
+  }
+  return criar_no_if(condicao, ramo_then, ramo_else);
+}
+
+static AstNode *parse_statement()
+{
+  if (match(TOKEN_IF))
+  {
+    return parse_if();
+  }
+  if (check(TOKEN_INT))
+  {
+    return parse_declaracao_variavel();
+  }
+  return parse_expression_statement();
+}
+
+static AstNode *parse_expression_statement()
+{
+  AstNode *expr = parse_expressao();
+  consume(TOKEN_SEMICOLON, "Esperava ';' apos a expressao.");
+  return criar_no_expressao_statement(expr);
 }

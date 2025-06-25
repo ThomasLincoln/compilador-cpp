@@ -1,3 +1,18 @@
-// teste.txt com expressão binária
-int resultado = 10 + 2 * 5;
-int x = -10 + (2 + 3);
+// Arquivo de teste completo para o parser
+
+int a = 10;
+int b;
+int c = (10 + 2) * 5; // Testa precedência com parênteses
+int d = -c + a;       // Testa operador unário e uso de variáveis
+
+// Testa o comando if-else
+if (d + 0) {
+  int resultado = a * c;
+} else {
+  int resultado = a + c;
+}
+
+// Testa um if sem else
+if (b) {
+  a = 100;
+}

@@ -23,6 +23,32 @@ static void imprimir_no_com_indentacao(AstNode *no, int indentacao)
 
     switch (no->type)
     {
+    case NODE_ATRIBUICAO:
+    {
+        AtribuicaoNode *node = (AtribuicaoNode *)no;
+        printf("└── Atribuicao (var: %.*s)\n", node->nome.length, node->nome.start);
+        imprimir_no_com_indentacao(node->valor, indentacao + 1);
+        break;
+    }
+    case NODE_EXPRESSAO_STATEMENT:
+    {
+        ExpressaoStatementNode *stmt = (ExpressaoStatementNode *)no;
+        printf("└── Stmt.Expressao\n");
+        imprimir_no_com_indentacao(stmt->expressao, indentacao + 1);
+        break;
+    }
+        // ast_printer.c (case NODE_IF corrigido)
+
+    case NODE_IF:
+    {
+        IfNode *stmt = (IfNode *)no;
+        printf("└── If.Statement\n");
+        // Use os novos nomes de campo para acessar os filhos
+        imprimir_no_com_indentacao(stmt->condicao, indentacao + 1);
+        imprimir_no_com_indentacao(stmt->ramo_then, indentacao + 1);
+        imprimir_no_com_indentacao(stmt->ramo_else, indentacao + 1);
+        break;
+    }
     case NODE_EXPR_VARIAVEL:
     {
         VariavelExprNode *expr = (VariavelExprNode *)no;
